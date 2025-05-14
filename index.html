@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bảo Vệ DDoS | Hệ Thống Mr.KING</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --primary-dark: #6A1B9A;
+            --secondary: #FF8C00;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --info: #17A2B8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+            color: var(--light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #8A2BE2, #FF8C00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            animation: gradientShift 8s infinite alternate;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        .tagline {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .security-badge {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .security-badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.3) 48%,
+                rgba(255, 255, 255, 0) 52%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+        
+        .verification-box {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: perspective(1000px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .verification-box:hover {
+            transform: perspective(1000px) translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 600;
+            background: linear-gradient(to right, #FFFFFF, #E0E0E0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .loading-container {
+            margin: 2rem 0;
+        }
+        
+        .loading-text {
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .loading-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 10px;
+            animation: loading 2.5s infinite ease-in-out;
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0%; left: 100%; }
+        }
+        
+        .captcha-container {
+            margin: 2.5rem 0;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .captcha-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .captcha-box:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+        
+        .captcha-text {
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1.5rem;
+            user-select: none;
+            text-shadow: 0 2px 10px rgba(138, 43, 226, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .captcha-text::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            animation: underline 2s infinite;
+        }
+        
+        @keyframes underline {
+            0% { transform: scaleX(0); opacity: 0; }
+            50% { transform: scaleX(1); opacity: 1; }
+            100% { transform: scaleX(0); opacity: 0; }
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(138, 43, 226, 0.1);
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+        }
+        
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .btn:hover::after {
+            transform: translateX(100%);
+        }
+        
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            color: #FFA500;
+            transform: rotate(180deg);
+        }
+        
+        .status {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .status.success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            display: block;
+        }
+        
+        .status.error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            display: block;
+        }
+        
+        .security-info {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+        
+        .security-features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .feature:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .feature i {
+            color: var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+        
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(to right, var(--dark), #2A2A4E);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .admin-badge i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            left: -100px;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: -150px;
+            right: -100px;
+            animation: float 18s infinite ease-in-out reverse;
+        }
+        
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--info);
+            top: 50%;
+            left: 20%;
+            animation: float 12s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(50px, 50px); }
+            50% { transform: translate(0, 100px); }
+            75% { transform: translate(-50px, 50px); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .verification-box {
+                padding: 2rem 1.5rem;
+            }
+            
+            .captcha-text {
+                font-size: 1.5rem;
+                letter-spacing: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <canvas id="particles" class="particles"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">Mr.KING Security</div>
+            <div class="tagline">Hệ Thống Bảo Vệ DDoS Tối Tân</div>
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i> KIỂM TRA BẢO MẬT
+            </div>
+        </header>
+        
+        <div class="verification-box">
+            <h1>Vui lòng hoàn thành kiểm tra bảo mật để truy cập website</h1>
+            
+            <div class="loading-container" id="initialCheck">
+                <div class="loading-text">Đang kiểm tra trình duyệt của bạn...</div>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <div class="loading-text">Quá trình này tự động. Bạn sẽ được chuyển hướng sau khi hoàn tất.</div>
+            </div>
+            
+            <div class="captcha-container" id="captchaSection" style="display: none;">
+                <div class="captcha-box">
+                    <div class="captcha-text" id="captchaText">A7B9C2</div>
+                    <div class="input-group">
+                        <input type="text" id="captchaInput" placeholder="Nhập đoạn mã ở trên" autocomplete="off">
+                        <i class="fas fa-keyboard input-icon"></i>
+                    </div>
+                </div>
+                <button class="btn" id="verifyBtn">
+                    <i class="fas fa-check-circle"></i> XÁC MINH
+                </button>
+                <button class="refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Làm mới CAPTCHA
+                </button>
+                <div class="status" id="status"></div>
+            </div>
+            
+            <div class="security-info">
+                <p>Hệ thống của bạn đang được bảo vệ bởi công nghệ chống DDoS tiên tiến nhất. Chúng tôi đang kiểm tra để đảm bảo yêu cầu của bạn là hợp lệ.</p>
+                
+                <div class="security-features">
+                    <div class="feature">
+                        <i class="fas fa-user-secret"></i> Ẩn IP thật 100%
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-virus"></i> Bảo vệ DDoS lớp 7
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i> Tốc độ siêu nhanh
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Được bảo vệ bởi Hệ Thống Bảo Mật Mr.KING</p>
+        <div class="admin-badge">
+            <i class="fas fa-crown"></i> Quản Trị: Mr.KING
+        </div>
+        <p>© 2023 Bản quyền thuộc về Mr.KING Security</p>
+    </footer>
+
+    <script>
+        // Particle effect
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = Math.floor(window.innerWidth / 10);
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5,
+                color: `rgba(138, 43, 226, ${Math.random() * 0.3 + 0.1})`
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x > canvas.width + 5 || p.x < -5) {
+                    p.speedX = -p.speedX;
+                }
+                
+                if (p.y > canvas.height + 5 || p.y < -5) {
+                    p.speedY = -p.speedY;
+                }
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // IP masking - No real IP is exposed
+        function maskIP() {
+            // This function intentionally does nothing to ensure no IP leakage
+            // In a real implementation, you would have server-side IP protection
+            return null;
+        }
+        
+        // Simulate Cloudflare-like verification process
+        document.addEventListener('DOMContentLoaded', function() {
+            maskIP(); // Ensure IP masking
+            
+            // Initial delay before showing CAPTCHA (like Cloudflare's checks)
+            setTimeout(function() {
+                document.getElementById('captchaSection').style.display = 'block';
+                document.getElementById('initialCheck').style.display = 'none';
+                generateCaptcha();
+                
+                // Simulate some users will pass without CAPTCHA
+                if (Math.random() > 0.6) {
+                    setTimeout(completeVerification, 1000);
+                }
+            }, 3000 + Math.random() * 2000);
+            
+            // CAPTCHA functionality
+            document.getElementById('verifyBtn').addEventListener('click', verifyCaptcha);
+            document.getElementById('refreshBtn').addEventListener('click', generateCaptcha);
+            document.getElementById('captchaInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyCaptcha();
+                }
+            });
+        });
+        
+        function generateCaptcha() {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captchaText').textContent = captcha;
+            document.getElementById('captchaInput').value = '';
+            document.getElementById('status').textContent = '';
+            document.getElementById('status').className = 'status';
+        }
+        
+        function verifyCaptcha() {
+            const userInput = document.getElementById('captchaInput').value;
+            const captchaText = document.getElementById('captchaText').textContent;
+            const statusEl = document.getElementById('status');
+            
+            if (userInput === '') {
+                statusEl.textContent = 'Vui lòng nhập mã CAPTCHA';
+                statusEl.className = 'status error';
+                return;
+            }
+            
+            if (userInput === captchaText) {
+                statusEl.textContent = 'Xác minh thành công! Đang chuyển hướng...';
+                statusEl.className = 'status success';
+                completeVerification();
+            } else {
+                statusEl.textContent = 'Mã CAPTCHA không đúng. Vui lòng thử lại.';
+                statusEl.className = 'status error';
+                generateCaptcha();
+            }
+        }
+        
+        function completeVerification() {
+            document.querySelector('.verification-box').innerHTML = `
+                <h1>Xác Minh Thành Công!</h1>
+                <div style="font-size: 5rem; margin: 1rem 0; color: var(--success);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <p>Bạn sẽ được chuyển hướng đến trang web trong giây lát...</p>
+                <div class="loading-container">
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                    </div>
+                </div>
+                <div class="security-info">
+                    <p>Phiên làm việc của bạn đã được bảo mật. IP thật của bạn đã được ẩn hoàn toàn.</p>
+                </div>
+            `;
+            
+            // Simulate redirect after delay
+            setTimeout(function() {
+                // In a real implementation, this would redirect to the original URL
+                // For demo purposes, we'll redirect to Google
+                window.location.href = 'https://www.google.com';
+            }, 2000);
+        }
+        
+        // Responsive adjustments
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
